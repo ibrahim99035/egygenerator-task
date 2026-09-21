@@ -33,7 +33,26 @@ and a **React + Vite + TypeScript** client with protected routes, form validatio
     └── .env.example
 ```
 
-## Getting Started
+## Quick Start
+
+Run both apps with a single command from the project root:
+
+```bash
+npm install       # root tooling (concurrently)
+npm run setup     # install server + client dependencies, create .env files from templates
+npm run dev       # start the API and the client together
+```
+
+| URL                             | Service    |
+|---------------------------------|------------|
+| <http://localhost:3000>         | NestJS API |
+| <http://localhost:3000/api/docs>| Swagger UI |
+| <http://localhost:5173>         | React app  |
+
+Output is prefixed per app (`[api]` / `[web]`) and Ctrl+C stops both.
+`npm run setup` never overwrites an existing `.env`, so review those files before the first run.
+
+## Getting Started (manual)
 
 ### Prerequisites
 
@@ -84,9 +103,14 @@ Errors: `400` validation, `401` invalid credentials, `409` email already registe
 
 ## Scripts
 
-| Location | Command             | Purpose                         |
-|----------|---------------------|---------------------------------|
-| server   | `npm run start:dev` | Dev server with watch mode      |
+| Location | Command             | Purpose                           |
+|----------|---------------------|-----------------------------------|
+| root     | `npm run setup`     | Install both apps + create .env   |
+| root     | `npm run dev`       | Start API and client together     |
+| root     | `npm run build`     | Build server and client           |
+| root     | `npm run lint`      | Lint server and client            |
+| root     | `npm run test`      | Run server unit tests             |
+| server   | `npm run start:dev` | Dev server with watch mode        |
 | server   | `npm test`          | Unit tests (Jest)               |
 | server   | `npm run lint`      | ESLint with autofix             |
 | server   | `npm run build`     | Compile to `dist/`              |
