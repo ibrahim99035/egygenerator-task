@@ -95,11 +95,38 @@ Runs on <http://localhost:5173>. Sign up, then you are redirected to the protect
 
 | Method | Endpoint       | Auth   | Description                             |
 |--------|----------------|--------|-----------------------------------------|
+| GET    | `/`            | —      | Health check: uptime, database state    |
 | POST   | `/auth/signup` | —      | Create an account, returns token + user |
 | POST   | `/auth/signin` | —      | Authenticate, returns token + user      |
 | GET    | `/auth/me`     | Bearer | Current user profile                    |
 
 Errors: `400` validation, `401` invalid credentials, `409` email already registered.
+
+The root health check returns `200` with `status: "ok"` once the database is
+connected (or `"starting"` while connecting) and `503` with `status: "degraded"`
+if the database cannot be reached. It also reports whether `MONGODB_URI`,
+`JWT_SECRET` and `FRONTEND_URL` are configured, which makes it the fastest way
+to check a deployment.
+
+## Deployment (Vercel)
+
+Deploy the repository twice, once per app, choosing the matching Root Directory:
+
+| Project | Root Directory | Environment variables |
+|---------|----------------|-----------------------|
+| API     | `server`       | `MONGODB_URI`, `JWT_SECRET`, `FRONTEND_URL` |
+| Web     | `client`       | `VITE_API_URL` (the API URL, inlined at build time) |
+
+Vercel detects the NestJS entrypoint (`server/src/main.ts`) and the Vite build
+automatically, so no build settings are needed. Two extra pieces make it behave:
+
+- `client/vercel.json` rewrites every path to `index.html` so client-side routes
+  such as `/signin` and `/app` survive a refresh.
+- MongoDB Atlas must allow Vercel's egress IPs (they are dynamic, so use
+  `0.0.0.0/0` or a Vercel static IP). Without it the API fails at startup and
+  the root health check is unreachable.
+
+`FRONTEND_URL` accepts a comma-separated list to allow several origins.
 
 ## Scripts
 
