@@ -1,30 +1,27 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  type ReactNode,
-} from 'react';
+import { ReactNode, createContext, useState } from 'react';
 
-import type { User, AuthResponse } from '../types/auth.types';
+import type { AuthResponse, User } from '../types/auth.types';
 
-interface AuthContextType {
+export type { AuthResponse, User };
+
+export type AuthContextValue = {
   user: User | null;
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (data: AuthResponse) => void;
   logout: () => void;
-}
+};
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 
 function readStoredToken(): string | null {
   return localStorage.getItem('accessToken');
 }
 
 function readStoredUser(): User | null {
-  const storedUser = localStorage.getItem('user');
-  return storedUser ? (JSON.parse(storedUser) as User) : null;
+  const raw = localStorage.getItem('user');
+  return raw ? (JSON.parse(raw) as User) : null;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -62,10 +59,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
-  }
-  return context;
-}
+export { useAuth } from './useAuth';
