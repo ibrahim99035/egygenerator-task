@@ -6,10 +6,6 @@ import { AppModule } from './app.module';
 
 const logger = new Logger('Bootstrap');
 
-/**
- * Allowed browser origins: FRONTEND_URL (comma-separated list supported) plus
- * the local dev server. Production frontend lives on Vercel.
- */
 function resolveCorsOrigins(): string[] {
   const configured = (process.env.FRONTEND_URL ?? '')
     .split(',')
@@ -56,9 +52,6 @@ async function bootstrap() {
   logger.log(`Swagger docs: http://localhost:${port}/api/docs`);
 }
 
-// Log startup failures with their real cause: serverless platforms only report
-// a generic invocation error otherwise. The database connection is established
-// during startup, so an unreachable database ends up here.
 bootstrap().catch((error: unknown) => {
   logger.error(
     'Application failed to start',

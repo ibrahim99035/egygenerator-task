@@ -33,8 +33,6 @@ export class AppController {
   getHealth(): HealthStatus {
     const health = this.appService.getHealth();
 
-    // Report an unhealthy dependency with a non-2xx status so uptime monitors
-    // and load balancers can act on it, while still returning the details.
     if (health.status === 'degraded') {
       throw new ServiceUnavailableException(health);
     }

@@ -15,10 +15,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-/**
- * Extracts a human-readable message from an axios/API error.
- * Handles the ValidationPipe format where `message` is an array.
- */
 export function getApiErrorMessage(
   error: unknown,
   fallback = 'Something went wrong. Please try again.',

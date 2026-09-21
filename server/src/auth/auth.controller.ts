@@ -58,7 +58,6 @@ export class AuthController {
     return this.authService.signin(dto);
   }
 
-  // Protected endpoint
   @UseGuards(JwtAuthGuard)
   @Get('me')
   @ApiBearerAuth()
