@@ -1,13 +1,29 @@
+import 'reflect-metadata';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+
+const logger = new Logger('Bootstrap');
+
+/**
+ * Allowed browser origins: FRONTEND_URL (comma-separated list supported) plus
+ * the local dev server. Production frontend lives on Vercel.
+ */
+function resolveCorsOrigins(): string[] {
+  const configured = (process.env.FRONTEND_URL ?? '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  return [...new Set([...configured, 'http://localhost:5173'])];
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: resolveCorsOrigins(),
     credentials: true,
   });
 
@@ -33,10 +49,20 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  const port = process.env.PORT || 3000;
+  const port = Number(process.env.PORT ?? 3000);
   await app.listen(port);
-  console.log(`Server running on http://localhost:${port}`);
-  console.log(`Swagger docs: http://localhost:${port}/api/docs`);
+
+  logger.log(`Server running on http://localhost:${port}`);
+  logger.log(`Swagger docs: http://localhost:${port}/api/docs`);
 }
 
-void bootstrap();
+// Log startup failures with their real cause: serverless platforms only report
+// a generic invocation error otherwise. The database connection is established
+// during startup, so an unreachable database ends up here.
+bootstrap().catch((error: unknown) => {
+  logger.error(
+    'Application failed to start',
+    error instanceof Error ? error.stack : String(error),
+  );
+  process.exit(1);
+});
