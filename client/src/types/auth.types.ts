@@ -1,0 +1,21 @@
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  user: User;
+}
+
+export interface SignUpData {
+  email: string;
+  name: string;
+  password: string;
+}
+
+export interface SignInData {
+  email: string;
+  password: string;
+}
